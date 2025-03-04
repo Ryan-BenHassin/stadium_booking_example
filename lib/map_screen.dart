@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart' as geolocator;
-import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
+import 'package:latlong2/latlong.dart';
 
 class MapScreen extends StatefulWidget {
   @override
@@ -8,18 +9,16 @@ class MapScreen extends StatefulWidget {
 }
 
 class _MapScreenState extends State<MapScreen> {
-
-  MapboxMap? mapboxMap;
+  MapController mapController = MapController();
+  LatLng? currentLocation;
 
   @override
   void initState() {
     super.initState();
-    
-    // _requestLocationPermission();
-    // WidgetsBinding.instance.addPostFrameCallback((_) {
-    //   _goToMyLocation();
-    // });
-    
+    _requestLocationPermission();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _goToMyLocation();
+    });
   }
 
   Future<void> _requestLocationPermission() async {
@@ -40,15 +39,10 @@ class _MapScreenState extends State<MapScreen> {
   Future<void> _goToMyLocation() async {
     try {
       final geolocator.Position position = await geolocator.Geolocator.getCurrentPosition();
-      print("\n\n My current position : ${position.latitude} \n\n");
-      
-      await mapboxMap?.easeTo(
-        CameraOptions(
-          center: Point(coordinates: Position(position.longitude, position.latitude)),
-          zoom: 14.0,
-        ),
-        MapAnimationOptions(duration: 1000)
-      );
+      setState(() {
+        currentLocation = LatLng(position.latitude, position.longitude);
+      });
+      mapController.move(currentLocation!, 14);
     } catch (e) {
       print('Error getting location: $e');
     }
@@ -57,18 +51,33 @@ class _MapScreenState extends State<MapScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Mapbox Example')),
-      body: MapWidget(
-        onMapCreated: (MapboxMap mapboxMap) {
-          this.mapboxMap = mapboxMap;
-          mapboxMap.location.updateSettings(
-            LocationComponentSettings(
-              enabled: true,
-              pulsingEnabled: true,
-              
+      appBar: AppBar(title: const Text('Flutter Map Example')),
+      body: FlutterMap(
+        mapController: mapController,
+        options: MapOptions(
+          center: LatLng(0, 0),
+          zoom: 2,
+        ),
+        children: [
+          TileLayer(
+            urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+            userAgentPackageName: 'com.example.app',
+            tileProvider: NetworkTileProvider(),
+            maxZoom: 19,
+            keepBuffer: 5,
+          ),
+          if (currentLocation != null)
+            MarkerLayer(
+              markers: [
+                Marker(
+                  point: currentLocation!,
+                  width: 80,
+                  height: 80,
+                  builder: (context) => Icon(Icons.my_location_rounded, color: Colors.blue, size: 40),
+                ),
+              ],
             ),
-          );
-        },
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _goToMyLocation,
