@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:geolocator/geolocator.dart' as geolocator;
+import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'models/complex.dart';
+import 'services/complex_service.dart';
 
 class MapScreen extends StatefulWidget {
   @override
@@ -12,43 +13,29 @@ class MapScreen extends StatefulWidget {
 class _MapScreenState extends State<MapScreen> {
   MapController mapController = MapController();
   LatLng? currentLocation;
-
-  // Add static list of complexes
-  final List<Complex> complexes = [
-    Complex(
-      name: 'Complex A',
-      longitude: 36.809019,
-      latitude: 10.149182,
-      description: 'San Francisco Complex',
-    ),
-    Complex(
-      name: 'Complex B',
-      latitude: 34.0522,
-      longitude: -118.2437,
-      description: 'Los Angeles Complex',
-    ),
-    // Add more complexes as needed
-  ];
+  List<Complex> complexes = [];
+  final ComplexService _complexService = ComplexService();
 
   @override
   void initState() {
     super.initState();
     _requestLocationPermission();
+    _loadComplexes();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _goToMyLocation();
+      // _goToMyLocation();
     });
   }
 
   Future<void> _requestLocationPermission() async {
-    bool serviceEnabled = await geolocator.Geolocator.isLocationServiceEnabled();
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
       return Future.error('Location services are disabled.');
     }
 
-    geolocator.LocationPermission permission = await geolocator.Geolocator.checkPermission();
-    if (permission == geolocator.LocationPermission.denied) {
-      permission = await geolocator.Geolocator.requestPermission();
-      if (permission == geolocator.LocationPermission.denied) {
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
         return Future.error('Location permissions are denied');
       }
     }
@@ -56,14 +43,48 @@ class _MapScreenState extends State<MapScreen> {
 
   Future<void> _goToMyLocation() async {
     try {
-      final geolocator.Position position = await geolocator.Geolocator.getCurrentPosition();
+      final Position position = await Geolocator.getCurrentPosition();
       setState(() {
         currentLocation = LatLng(position.latitude, position.longitude);
       });
-      mapController.move(currentLocation!, 14);
+      mapController.move(currentLocation!, 14,); // Poisitional arguments
     } catch (e) {
       print('Error getting location: $e');
     }
+  }
+
+  Future<void> _loadComplexes() async {
+    try {
+      final loadedComplexes = await _complexService.fetchComplexes();
+    
+      complexes = loadedComplexes;
+    
+      setState(() => print("updated"));
+
+    } catch (e) {
+      print('Error loading complexes: $e');
+    }
+  }
+
+  void _showComplexDetails(Complex complex) {
+    showDialog(
+      barrierColor: Colors.black.withOpacity(0.8),
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(complex.name),
+        content: Text(complex.description ?? 'No description available'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text('Close'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text('OK'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -99,12 +120,16 @@ class _MapScreenState extends State<MapScreen> {
                   point: LatLng(complex.latitude, complex.longitude),
                   width: 80,
                   height: 80,
-                  builder: (context) => Tooltip(
-                    message: '${complex.name}\n${complex.description ?? ""}',
-                    child: Icon(Icons.location_on_sharp, color: Colors.red, size: 50),
+                  builder: (context) => GestureDetector(
+                    onTap: () => _showComplexDetails(complex),
+                    child: Tooltip(
+                      message: '${complex.name}\n${complex.description ?? ""}',
+                      child: Icon(Icons.location_on_sharp, color: Colors.red, size: 50),
+                    ),
                   ),
                 ),
               ),
+
             ],
           ),
         ],
