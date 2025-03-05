@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart' as geolocator;
 import 'package:latlong2/latlong.dart';
+import 'models/complex.dart';
 
 class MapScreen extends StatefulWidget {
   @override
@@ -11,6 +12,23 @@ class MapScreen extends StatefulWidget {
 class _MapScreenState extends State<MapScreen> {
   MapController mapController = MapController();
   LatLng? currentLocation;
+
+  // Add static list of complexes
+  final List<Complex> complexes = [
+    Complex(
+      name: 'Complex A',
+      longitude: 36.809019,
+      latitude: 10.149182,
+      description: 'San Francisco Complex',
+    ),
+    Complex(
+      name: 'Complex B',
+      latitude: 34.0522,
+      longitude: -118.2437,
+      description: 'Los Angeles Complex',
+    ),
+    // Add more complexes as needed
+  ];
 
   @override
   void initState() {
@@ -51,7 +69,7 @@ class _MapScreenState extends State<MapScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Flutter Map Example')),
+      appBar: AppBar(title: const Text('Complexes Map')),
       body: FlutterMap(
         mapController: mapController,
         options: MapOptions(
@@ -66,17 +84,29 @@ class _MapScreenState extends State<MapScreen> {
             maxZoom: 19,
             keepBuffer: 5,
           ),
-          if (currentLocation != null)
-            MarkerLayer(
-              markers: [
+          MarkerLayer(
+            markers: [
+              if (currentLocation != null)
                 Marker(
                   point: currentLocation!,
                   width: 80,
                   height: 80,
                   builder: (context) => Icon(Icons.my_location_rounded, color: Colors.blue, size: 40),
                 ),
-              ],
-            ),
+              // Add markers for complexes
+              ...complexes.map(
+                (complex) => Marker(
+                  point: LatLng(complex.latitude, complex.longitude),
+                  width: 80,
+                  height: 80,
+                  builder: (context) => Tooltip(
+                    message: '${complex.name}\n${complex.description ?? ""}',
+                    child: Icon(Icons.location_on_sharp, color: Colors.red, size: 50),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
