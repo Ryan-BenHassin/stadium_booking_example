@@ -1,36 +1,34 @@
 import '../models/complex.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class ComplexService {
+  final String baseUrl = 'http://10.0.2.2:1337/api/complexes';
+
   Future<List<Complex>> fetchComplexes() async {
-    // Simulate API delay
-    await Future.delayed(Duration(seconds: 5));
-    
-    // Return mock data (will be replaced with actual API call later)
-    List<Complex> complexes_list = [
-      Complex(
-        name: 'Complex Beb Saadoun',
-        longitude: 36.809019,
-        latitude: 10.149182,
-        description: 'Beb Saadoun Complex',
-      ),
-
-      Complex(
-        name: 'Complex Ras Tabia',
-        latitude: 36.819857,
-        longitude: 10.151501,
-        description: 'Ras tabia Complex',
-      ),
-
-      Complex(
-        name: 'Complex B',
-        latitude: 35.0522,
-        longitude: -118.900,
-        description: 'Los Angeles Complex',
-      ),
-    ];
-
-    return complexes_list;
-
-
+    try {
+      final response = await http.get(Uri.parse(baseUrl));
+      
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> jsonResponse = json.decode(response.body);
+        final List<dynamic> complexesData = jsonResponse['data'];
+        
+        return complexesData.map((complex) {
+          final address = complex['address'];
+          return Complex(
+            name: complex['title'] ?? '',
+            // Use address if available, otherwise default to 0,0
+            latitude: address?['latitude']?.toDouble() ?? 0.0,
+            longitude: address?['longitude']?.toDouble() ?? 0.0,
+            description: 'ID: ${complex['documentId']}',
+          );
+        }).toList();
+      } else {
+        throw Exception('Failed to load complexes: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching complexes: $e');
+      return [];
+    }
   }
 }
