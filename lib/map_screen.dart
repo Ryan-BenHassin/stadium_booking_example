@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:table_calendar/table_calendar.dart';
 import 'models/complex.dart';
 import 'services/complex_service.dart';
+import 'widgets/booking_dialog.dart';
 
 class MapScreen extends StatefulWidget {
   @override
@@ -79,11 +81,18 @@ class _MapScreenState extends State<MapScreen> {
             child: Text('Close'),
           ),
           TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text('OK'),
+            onPressed: () => _showBookingDialog(complex),
+            child: Text('Book'),
           ),
         ],
       ),
+    );
+  }
+
+  void _showBookingDialog(Complex complex) {
+    showDialog(
+      context: context,
+      builder: (context) => BookingDialog(complex: complex),
     );
   }
 

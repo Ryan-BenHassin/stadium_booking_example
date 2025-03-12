@@ -2,48 +2,34 @@ PODS:
   - Flutter (1.0.0)
   - geolocator_apple (1.2.0):
     - Flutter
-  - mapbox_maps_flutter (2.5.2):
+  - path_provider_foundation (0.0.1):
     - Flutter
-    - MapboxMaps (~> 11.9.2)
-    - Turf (= 4.0.0)
-  - MapboxCommon (24.9.0):
-    - Turf (= 4.0.0)
-  - MapboxCoreMaps (11.9.3):
-    - MapboxCommon (~> 24.9)
-  - MapboxMaps (11.9.2):
-    - MapboxCommon (= 24.9.0)
-    - MapboxCoreMaps (= 11.9.3)
-    - Turf (= 4.0.0)
-  - Turf (4.0.0)
+    - FlutterMacOS
+  - sqflite_darwin (0.0.4):
+    - Flutter
+    - FlutterMacOS
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
   - geolocator_apple (from `.symlinks/plugins/geolocator_apple/ios`)
-  - mapbox_maps_flutter (from `.symlinks/plugins/mapbox_maps_flutter/ios`)
-
-SPEC REPOS:
-  trunk:
-    - MapboxCommon
-    - MapboxCoreMaps
-    - MapboxMaps
-    - Turf
+  - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
+  - sqflite_darwin (from `.symlinks/plugins/sqflite_darwin/darwin`)
 
 EXTERNAL SOURCES:
   Flutter:
     :path: Flutter
   geolocator_apple:
     :path: ".symlinks/plugins/geolocator_apple/ios"
-  mapbox_maps_flutter:
-    :path: ".symlinks/plugins/mapbox_maps_flutter/ios"
+  path_provider_foundation:
+    :path: ".symlinks/plugins/path_provider_foundation/darwin"
+  sqflite_darwin:
+    :path: ".symlinks/plugins/sqflite_darwin/darwin"
 
 SPEC CHECKSUMS:
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
   geolocator_apple: 9bcea1918ff7f0062d98345d238ae12718acfbc1
-  mapbox_maps_flutter: e025b2b7b3c150c84a3981d335f0c258b5d7745c
-  MapboxCommon: 678bfc4b477a804244fd7323c79cc7f2402f844e
-  MapboxCoreMaps: 5bbd2051cea316eb0027f65af4612ffbf182f231
-  MapboxMaps: 0cd9c1fac047adc2b41d05a7d3413e22a40364db
-  Turf: c9eb11a65d96af58cac523460fd40fec5061b081
+  path_provider_foundation: 2b6b4c569c0fb62ec74538f866245ac84301af46
+  sqflite_darwin: 5a7236e3b501866c1c9befc6771dfd73ffb8702d
 
 PODFILE CHECKSUM: 819463e6a0290f5a72f145ba7cde16e8b6ef0796
 
