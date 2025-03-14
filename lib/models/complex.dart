@@ -1,4 +1,5 @@
 class Complex {
+  final int id;
   final String documentId;
   final String name;
   final double latitude;
@@ -6,6 +7,7 @@ class Complex {
   final String? description;
 
   Complex({
+    required this.id,
     required this.documentId,
     required this.name,
     required this.latitude,

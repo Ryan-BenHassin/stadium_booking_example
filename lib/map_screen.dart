@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:table_calendar/table_calendar.dart';
 import 'models/complex.dart';
 import 'services/complex_service.dart';
+import 'services/booking_service.dart';
 import 'widgets/booking_dialog.dart';
 
 class MapScreen extends StatefulWidget {
@@ -17,6 +17,9 @@ class _MapScreenState extends State<MapScreen> {
   LatLng? currentLocation;
   List<Complex> complexes = [];
   final ComplexService _complexService = ComplexService();
+  final BookingService _bookingService = BookingService();
+  DateTime? _selectedDate;
+  String? _selectedTime;
 
   @override
   void initState() {
@@ -92,7 +95,10 @@ class _MapScreenState extends State<MapScreen> {
   void _showBookingDialog(Complex complex) {
     showDialog(
       context: context,
-      builder: (context) => BookingDialog(complex: complex),
+      builder: (context) => BookingDialog(
+        complex: complex,
+        // bookingService: _bookingService,
+      ),
     );
   }
 

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mapbox_first/map_screen.dart';
+import 'package:mapbox_first/screens/main_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -35,7 +35,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: MapScreen(),
+      body: MainScreen(),
     );
   }
 }

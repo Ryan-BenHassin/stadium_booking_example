@@ -20,6 +20,7 @@ class ComplexService {
         return complexesData.map((complex) {
           final address = complex['address'];
           return Complex(
+            id: complex['id'],
             documentId: complex['documentId'],
             name: complex['title'] ?? '',
             // Use address if available, otherwise default to 0,0

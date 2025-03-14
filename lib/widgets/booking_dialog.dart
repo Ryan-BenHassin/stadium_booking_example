@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:another_flushbar/flushbar.dart';
 import '../models/complex.dart';
 import '../services/booking_service.dart';
 
@@ -106,6 +107,43 @@ class _BookingDialogState extends State<BookingDialog> {
     );
   }
 
+  Future<void> _handleBookingConfirmation() async {
+    if (_selectedDate == null || _selectedTime == null) return;
+
+    // Parse time string
+    final timeParts = _selectedTime!.split(':');
+    final hour = int.parse(timeParts[0]);
+    final minute = int.parse(timeParts[1]);
+
+    // Combine date and time
+    final dateTime = DateTime(
+      _selectedDate!.year,
+      _selectedDate!.month,
+      _selectedDate!.day,
+      hour,
+      minute,
+    );
+
+    final success = await _bookingService.createReservation(
+      userID: 1,
+      complexId : widget.complex.id,
+      dateTime : dateTime,
+    );
+
+    // if (!context.mounted) return;
+    Navigator.pop(context);
+    Navigator.pop(context);
+
+    Flushbar(
+      message: success ? 'Booking confirmed!' : 'Failed to book. Please try again.',
+      duration: Duration(seconds: 3),
+      margin: EdgeInsets.symmetric(horizontal: 20, vertical: 50),
+      borderRadius: BorderRadius.circular(8),
+      backgroundColor: success ? Colors.green : Colors.red,
+      flushbarPosition: FlushbarPosition.TOP,
+    ).show(context);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Dialog(
@@ -137,10 +175,7 @@ class _BookingDialogState extends State<BookingDialog> {
                 ),
                 if (_selectedDate != null && _selectedTime != null)
                   TextButton(
-                    onPressed: () {
-                      // TODO: Handle booking confirmation
-                      Navigator.pop(context);
-                    },
+                    onPressed: _handleBookingConfirmation,
                     child: Text('Confirm'),
                   ),
               ],
