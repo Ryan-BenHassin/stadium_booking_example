@@ -99,7 +99,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Profile'),
+        title: const Text('Profileeeeee'),
         actions: [
           IconButton(
             icon: const Icon(Icons.edit),
@@ -136,6 +136,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                           enabled: _isEditing,
                           style: const TextStyle(color: Colors.black),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter your first name';
+                            }
+                            return null;
+                          },
                         ),
                         TextFormField(
                           controller: _lastnameController,
@@ -143,24 +149,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             labelText: 'Last Name',
                             fillColor: Colors.transparent,
                           ),
-                          enabled: _isEditing,
-                          style: const TextStyle(color: Colors.black),
-                        ),
-                        TextFormField(
-                          controller: _phoneController,
-                          decoration: const InputDecoration(
-                            labelText: 'Phone',
-                            fillColor: Colors.transparent,
-                          ),
-                          enabled: _isEditing,
-                          style: const TextStyle(color: Colors.black),
-                        ),
-                        TextFormField(
-                          controller: _emailController,
-                          decoration: const InputDecoration(
-                            labelText: 'Email',
-                            fillColor: Colors.transparent,
-                          ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter your last name';
+                            }
+                            return null;
+                          },
                           enabled: _isEditing,
                           style: const TextStyle(color: Colors.black),
                         ),
@@ -168,13 +162,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         if (_isEditing)
                           ElevatedButton(
                             onPressed: _isLoading ? null : _handleSave,
-                            child: _isLoading
-                                ? const SizedBox(
-                                    width: 20,
-                                    height: 20,
-                                    child: CircularProgressIndicator(strokeWidth: 2),
-                                  )
-                                : const Text('Save Changes'),
+                            child: const Text('Save Changes'),
                           ),
                       ],
                     ),

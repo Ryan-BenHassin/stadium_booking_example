@@ -67,11 +67,44 @@ class _BookingsScreenState extends State<BookingsScreen> {
                         
                         final formattedDate = DateFormat('MMM d, y - HH:mm').format(date);
                         final complex = booking['complex'] ?? {};
+                        final status = booking['state'] ?? 'PENDING';
                         
                         return ListTile(
                           title: Text(complex['title'] ?? 'Unknown Complex'),
                           subtitle: Text(formattedDate),
-                          trailing: Text(booking['state'] ?? 'PENDING'),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(status),
+                              if (status == 'PENDING')
+                                IconButton(
+                                  icon: Icon(Icons.cancel, color: Colors.red),
+                                  onPressed: () async {
+                                    final success = await _bookingService.cancelReservation(
+                                      booking['documentId']
+                                    );
+                                    if (!mounted) return;
+                                    
+                                    if (success) {
+                                      showFlushBar(
+                                        context,
+                                        message: 'Booking cancelled successfully',
+                                        success: true,
+                                        fromBottom: false,
+                                      );
+                                      _loadBookings();
+                                    } else {
+                                      showFlushBar(
+                                        context,
+                                        message: 'Failed to cancel booking',
+                                        success: false,
+                                        fromBottom: false,
+                                      );
+                                    }
+                                  },
+                                ),
+                            ],
+                          ),
                         );
                       },
                     ),

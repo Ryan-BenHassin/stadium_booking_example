@@ -39,4 +39,21 @@ class BookingService {
     );
     return List<Map<String, dynamic>>.from(data['data'] ?? []);
   }
+
+  Future<bool> cancelReservation(String reservationId) async {
+    try {
+      await _httpClient.put(
+        '${AuthService.baseUrl}/reservations/$reservationId',
+        body: {
+          'data': {
+            'state': 'CANCELED'
+          }
+        },
+      );
+      return true;
+    } catch (e) {
+      print('Error canceling reservation: $e');
+      return false;
+    }
+  }
 }
