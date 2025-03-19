@@ -4,8 +4,8 @@ import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'models/complex.dart';
 import 'services/complex_service.dart';
-import 'services/booking_service.dart';
 import 'widgets/booking_dialog.dart';
+import 'utils/showFlushbar.dart';
 
 class MapScreen extends StatefulWidget {
   @override
@@ -17,9 +17,6 @@ class _MapScreenState extends State<MapScreen> {
   LatLng? currentLocation;
   List<Complex> complexes = [];
   final ComplexService _complexService = ComplexService();
-  final BookingService _bookingService = BookingService();
-  DateTime? _selectedDate;
-  String? _selectedTime;
 
   @override
   void initState() {
@@ -61,13 +58,28 @@ class _MapScreenState extends State<MapScreen> {
   Future<void> _loadComplexes() async {
     try {
       final loadedComplexes = await _complexService.fetchComplexes();
-    
-      complexes = loadedComplexes;
-    
-      setState(() => print("updated"));
-
+      setState(() {
+        complexes = loadedComplexes;
+      });
     } catch (e) {
       print('Error loading complexes: $e');
+      if (!mounted) return;
+      showFlushBar(
+        context,
+        message: 'Failed to load complexes. Please check your connection.',
+        success: false,
+        fromBottom: false,
+      );
+    }
+  }
+
+  Future<void> _loadMapData() async {
+    try {
+      // API call here
+    } catch (e) {
+      if (mounted) {
+        showFlushBar(context, message: 'Failed to load map data', success: false);
+      }
     }
   }
 

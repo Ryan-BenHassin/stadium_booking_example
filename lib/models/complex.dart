@@ -14,4 +14,16 @@ class Complex {
     required this.longitude,
     this.description,
   });
+
+  factory Complex.fromJson(Map<String, dynamic> json) {
+    final address = json['address'] as Map<String, dynamic>?;
+    return Complex(
+      id: json['id'] ?? 0,
+      documentId: json['documentId']?.toString() ?? '',
+      name: json['title']?.toString() ?? '',
+      latitude: address?['latitude']?.toDouble() ?? 0.0,
+      longitude: address?['longitude']?.toDouble() ?? 0.0,
+      description: 'ID: ${json['documentId']}',
+    );
+  }
 }

@@ -9,16 +9,22 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
-  
-  final List<Widget> _screens = [
-    MapScreen(),
-    BookingsScreen(),
-  ];
+
+  Widget _getScreen() {
+    switch (_selectedIndex) {
+      case 0:
+        return MapScreen();
+      case 1:
+        return BookingsScreen();
+      default:
+        return MapScreen();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _screens[_selectedIndex],
+      body: _getScreen(),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: (index) => setState(() => _selectedIndex = index),

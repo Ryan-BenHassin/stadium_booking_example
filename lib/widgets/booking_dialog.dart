@@ -3,6 +3,7 @@ import 'package:table_calendar/table_calendar.dart';
 import 'package:another_flushbar/flushbar.dart';
 import '../models/complex.dart';
 import '../services/booking_service.dart';
+import '../providers/user_provider.dart';
 
 class BookingDialog extends StatefulWidget {
   final Complex complex;
@@ -124,24 +125,47 @@ class _BookingDialogState extends State<BookingDialog> {
       minute,
     );
 
-    final success = await _bookingService.createReservation(
-      userID: 1,
-      complexId : widget.complex.id,
-      dateTime : dateTime,
-    );
+    await _handleBooking(dateTime);
+  }
 
-    // if (!context.mounted) return;
-    Navigator.pop(context);
-    Navigator.pop(context);
+  Future<void> _handleBooking(DateTime dateTime) async {
+    try {
+      if (UserProvider.user == null) {
+        throw Exception('User not logged in');
+      }
 
-    Flushbar(
-      message: success ? 'Booking confirmed!' : 'Failed to book. Please try again.',
-      duration: Duration(seconds: 3),
-      margin: EdgeInsets.symmetric(horizontal: 20, vertical: 50),
-      borderRadius: BorderRadius.circular(8),
-      backgroundColor: success ? Colors.green : Colors.red,
-      flushbarPosition: FlushbarPosition.TOP,
-    ).show(context);
+      final success = await _bookingService.createReservation(
+        userID: UserProvider.user!.id,
+        complexId: widget.complex.id,
+        dateTime: dateTime,
+      );
+
+      if (!mounted) return;
+
+      Navigator.pop(context);
+      Navigator.pop(context);
+
+      Flushbar(
+        message: success ? 'Booking confirmed!' : 'Failed to book. Please try again.',
+        duration: Duration(seconds: 3),
+        margin: EdgeInsets.symmetric(horizontal: 20, vertical: 50),
+        borderRadius: BorderRadius.circular(8),
+        backgroundColor: success ? Colors.green : Colors.red,
+        flushbarPosition: FlushbarPosition.TOP,
+      ).show(context);
+    } catch (e) {
+      print('Error during booking: $e');
+      if (!mounted) return;
+      
+      Flushbar(
+        message: 'Failed to create booking. Please try again.',
+        duration: Duration(seconds: 3),
+        margin: EdgeInsets.symmetric(horizontal: 20, vertical: 50),
+        borderRadius: BorderRadius.circular(8),
+        backgroundColor: Colors.red,
+        flushbarPosition: FlushbarPosition.TOP,
+      ).show(context);
+    }
   }
 
   @override

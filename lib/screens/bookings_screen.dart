@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:mapbox_first/services/booking_service.dart';
 import 'package:intl/intl.dart';
+import '../utils/showFlushbar.dart';
+import '../providers/user_provider.dart';
 
 class BookingsScreen extends StatefulWidget {
   @override
@@ -19,14 +21,24 @@ class _BookingsScreenState extends State<BookingsScreen> {
   }
 
   Future<void> _loadBookings() async {
+    setState(() => _isLoading = true);
     try {
-      final bookings = await _bookingService.fetchUserBookings(userID: 1);
+      final bookings = await _bookingService.fetchUserBookings(
+        userID: UserProvider.user!.id,
+      );
       setState(() {
         _bookings = bookings;
         _isLoading = false;
       });
     } catch (e) {
       print('Error loading bookings: $e');
+      if (!mounted) return;
+      showFlushBar(
+        context,
+        message: 'Failed to load bookings. Please check your connection.',
+        success: false,
+        fromBottom: false,
+      );
       setState(() => _isLoading = false);
     }
   }
