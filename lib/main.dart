@@ -1,10 +1,48 @@
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:mapbox_first/screens/bookings_screen.dart';
-import 'screens/splash_screen.dart';
+import 'package:mapbox_first/screens/splash_screen.dart';
+import 'package:mapbox_first/utils/showFlushbar.dart';
+import 'firebase_options.dart';
 import 'screens/profile_screen.dart';
 import 'map_screen.dart';
+import 'services/notification_serivce.dart';
 
-void main() {
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
+  print('Background message: ${message.messageId}');
+}
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    print('\n\nForeground message received:');
+    print('Message ID: ${message.messageId}');
+    if (message.notification != null) {
+      final context = navigatorKey.currentContext;
+      if (context != null) {
+        showFlushBar(
+          context,
+          message: message.notification?.body ?? '',
+          success: true,
+          fromBottom: false,
+        );
+      }
+    }
+  });
+
+  final notificationService = NotificationService();
+  await notificationService.initNotifications();
+  
   runApp(const MyApp());
 }
 
@@ -14,12 +52,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: navigatorKey,
       title: 'Flutter Demo',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const SplashScreen(),
+      home: SplashScreen(),
     );
   }
 }
@@ -67,7 +106,6 @@ class _MyHomePageState extends State<MyHomePage> {
             _selectedIndex = index;
             _isLoading = true;
           });
-          // Simulate screen loading
           Future.delayed(const Duration(milliseconds: 300), () {
             if (mounted) {
               setState(() => _isLoading = false);
